@@ -29,6 +29,6 @@ fn main() {
 }
 ```
 # Output
-
+![output](./output.png)
 
 # Documentation
