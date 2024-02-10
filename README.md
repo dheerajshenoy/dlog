@@ -16,7 +16,7 @@ fn main() {
     let mut logger: Logger = Logger {
         loglabel: "CUSTOM LOG LABEL".to_string(),
         loglevel: LogLevel::Debug,
-        logtype: LogType::File("LOG.txt".to_string()),
+        logtype: LogType::StdOut,
         textcolor: "#686956".to_string(),
         textstyle: TextStyle::BoldItalic,
         enabled: false,
@@ -32,3 +32,5 @@ fn main() {
 ![output](./output.png)
 
 # Documentation
+
+Docs can be found [here](./target/doc/dlog/index.html)

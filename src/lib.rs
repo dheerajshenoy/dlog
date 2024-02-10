@@ -26,6 +26,7 @@ pub enum TextStyle {
     ItalicUnderline,
     BoldItalicStrike,
     BoldStrikeUnderline,
+    BoldUnderlineItalic,
 }
 
 /// Logger struct that is the starting point which defines the logger.
@@ -88,7 +89,7 @@ impl Logger {
         }
     }
 
-    pub fn msg(&self, message: &str) {
+    pub fn log(&self, message: &str) {
         if self.enabled == true {
             match self.loglevel {
                 LogLevel::All => self.__all(message),
@@ -98,7 +99,15 @@ impl Logger {
         }
     }
 
-    pub fn setLogType(&mut self, logtype: LogType) {
+    pub fn set_text_color(&mut self, color: String) {
+        self.textcolor = color;
+    }
+
+    pub fn set_text_style(&mut self, style: TextStyle) {
+        self.textstyle = style;
+    }
+
+    pub fn set_log_type(&mut self, logtype: LogType) {
         self.logtype = logtype;
     }
 
@@ -115,16 +124,24 @@ impl Logger {
     }
 
     fn __debug(&self, message: &str) {
-        let fmtcolor = Self::__hex_to_ansi_color(&self.textcolor).expect("Invalid color");
+        match self.logtype {
+            LogType::StdOut => {
+                let fmtcolor = Self::__hex_to_ansi_color(&self.textcolor).expect("Invalid color");
 
-        let fmtstyle = match self.textstyle {
-            TextStyle::Bold => Style::new().bold().fg(fmtcolor),
-            TextStyle::BoldItalic => Style::new().bold().italic().fg(fmtcolor),
-            _ => todo!("DD")
-        };
+                let fmtstyle = match self.textstyle {
+                    TextStyle::Bold => Style::new().bold().fg(fmtcolor),
+                    TextStyle::BoldItalic => Style::new().bold().italic().fg(fmtcolor),
+                    TextStyle::BoldUnderline => Style::new().bold().underline().fg(fmtcolor),
+                    TextStyle::BoldUnderlineItalic => Style::new().bold().underline().italic().fg(fmtcolor),
+                    _ => todo!("DD")
+                };
 
-        let fmtstring = fmtstyle.paint(message);
-        println!("DEBUG: {}", fmtstring);
+                let fmtstring = fmtstyle.paint(message);
+                println!("DEBUG: {}", fmtstring);
+            },
+
+            _ => todo!("NOT IMPLEMENTED"),
+        }
     }
 
     fn __warning(&self, message: &str) {
@@ -170,6 +187,8 @@ impl BitOr for TextStyle {
             (TextStyle::Italic, TextStyle::Strike) | (TextStyle::Strike, TextStyle::Italic) => TextStyle::ItalicStrike,
             (TextStyle::Italic, TextStyle::Underline) | (TextStyle::Underline, TextStyle::Italic) => TextStyle::ItalicUnderline,
             (TextStyle::ItalicStrike, TextStyle::Bold) | (TextStyle::Bold, TextStyle::ItalicStrike) => TextStyle::BoldItalicStrike,
+            (TextStyle::Italic, TextStyle::BoldUnderline) => TextStyle::BoldUnderlineItalic,
+            (TextStyle::BoldUnderline, TextStyle::Italic) => TextStyle::BoldUnderlineItalic,
             _ => TextStyle::Bold
         }
     }
